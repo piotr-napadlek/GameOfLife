@@ -2,15 +2,27 @@ package com.capgemini.gameoflife.cell;
 
 import java.util.*;
 
-public abstract class GameCell implements Cell {
-	private Set<Cell> neighbours = new HashSet<Cell>(8, 1.0f);
+import com.capgemini.gameoflife.board.utils.BoardPosition;
+
+public class GameCell implements Cell {
+	public static GameCell deadAt(BoardPosition position) {
+		return new GameCell(LifeState.DEAD, position);
+	}
+	
+	public static GameCell livingAt(BoardPosition position) {
+		return new GameCell(LifeState.ALIVE, position);
+	}
+	
+	private final Set<Cell> neighbours = new HashSet<Cell>(8, 1.0f);
+	private final BoardPosition position;
 	private LifeState currentState;
 	private LifeState nextGenerationState;
 	private int livingNeighbours;
 
-	public GameCell(LifeState cellState) {
+	private GameCell(LifeState cellState, BoardPosition position) {
 		currentState = cellState;
 		nextGenerationState = cellState;
+		this.position = position;
 	}
 
 	@Override
@@ -27,6 +39,10 @@ public abstract class GameCell implements Cell {
 		return currentState;
 	}
 
+	public BoardPosition getPosition() {
+		return position;
+	}
+	
 	@Override
 	public void nextGeneration() {
 		if (currentState.equals(nextGenerationState) == false) {
@@ -42,7 +58,6 @@ public abstract class GameCell implements Cell {
 						.forEach(cell -> cell.decreaseLivingNeighboursCount());
 				break;
 			default:
-				
 			}
 		}
 	}
