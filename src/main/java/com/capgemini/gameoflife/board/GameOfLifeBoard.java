@@ -24,18 +24,34 @@ public final class GameOfLifeBoard implements CellGameBoard {
 		IntStream.range(0, roundsAmount).forEach(i -> iterate());
 	}
 
-	private void applyLinkingTo(Map<BoardPosition, Cell> cells) {
-		cells.entrySet().forEach(entry -> { 
-			if (entry.getValue().getNeighbours().size() < 8) {
-				setCellNeighbours(entry);
+	private void applyLinkingTo() {
+		Map<BoardPosition, Cell> neighboursToAdd = new HashMap<>(8, 1.0f);
+		
+		cellsMap.entrySet().forEach(entry -> { 
+			if (entry.getValue().getNeighbours().size() < 100000
+					&& entry.getValue() instanceof GameCell) {
+				entry.getKey().getNeighbourPositions().forEach(pos -> {
+					Cell neighbour; 
+					if (!cellsMap.containsKey(pos)) {
+						neighbour = GameCell.deadAt(pos);
+						neighboursToAdd.put(pos, GameCell.deadAt(pos));
+					} else {
+					neighbour = cellsMap.get(pos);
+					}
+					entry.getValue().addNeighbour(neighbour);
+					neighbour.addNeighbour(entry.getValue());
+				});
 			}
 		});
+		
+		cellsMap.putAll(neighboursToAdd);
 	}
 
 	private void setCellNeighbours(Entry<BoardPosition, Cell> cellEntry) {
+		Map<BoardPosition, Cell> neighboursToAdd = new HashMap<>(8, 1.0f);
 		cellEntry.getKey().getNeighbourPositions().forEach(pos -> {
 			if (!cellsMap.containsKey(pos)) {
-				cellsMap.put(pos, GameCell.deadAt(pos));
+				neighboursToAdd.put(pos, GameCell.deadAt(pos));
 			}
 			Cell neighbour = cellsMap.get(pos); 
 			cellEntry.getValue().addNeighbour(neighbour);
@@ -44,16 +60,18 @@ public final class GameOfLifeBoard implements CellGameBoard {
 	}
 
 	private void iterate() {
-		cellsToCalculate.values().forEach(cell -> cell.evaluateNextGeneration());
-		cellsToCalculate.values().forEach(cell -> cell.nextGeneration());
+		cellsMap.values().forEach(cell -> cell.evaluateNextGeneration());
+		cellsMap.values().forEach(cell -> cell.nextGeneration());
+		applyLinkingTo();
 		filterCellsToCalculate();
-		applyLinkingTo(cellsToCalculate);
-		addToBeBornCellsToCalculated();
+//		addToBeBornCellsToCalculated();
 	}
 
 	private void filterCellsToCalculate() {
-		cellsToCalculate.entrySet()
-					.removeIf(entry -> LifeState.DEAD.equals(entry.getValue().getState()));
+		cellsMap.entrySet()
+					.removeIf(entry -> LifeState.DEAD.equals(entry.getValue().getState())
+							&& entry.getValue().getLivingNeighboursCount() == 0
+							&& entry.getValue() instanceof GameCell);
 	}
 
 	private void addToBeBornCellsToCalculated() {

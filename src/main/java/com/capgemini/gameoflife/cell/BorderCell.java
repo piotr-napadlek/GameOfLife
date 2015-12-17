@@ -3,8 +3,6 @@ package com.capgemini.gameoflife.cell;
 import java.util.Collection;
 import java.util.Collections;
 
-import com.capgemini.gameoflife.board.utils.BoardPosition;
-
 public final class BorderCell implements Cell {
 	private static final BorderCell borderCell = new BorderCell();
 

@@ -22,7 +22,7 @@ public class GameOfLife {
 				.withLivingCellAtPosition(16, 19)
 				.build();
 
-		IntStream.range(0, 320).forEach(i -> {
+		IntStream.range(0, 20).forEach(i -> {
 			logger.info(gameBoard);
 			gameBoard.processRounds(1);
 			try {
