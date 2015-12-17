@@ -40,8 +40,4 @@ public final class BorderCell implements Cell {
 	public int getLivingNeighboursCount() {
 		return 0;
 	}
-	@Override
-	public BoardPosition getPosition() {
-		return null;
-	}
 }

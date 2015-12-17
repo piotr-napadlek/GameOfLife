@@ -1,6 +1,7 @@
 package com.capgemini.gameoflife.board;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.stream.*;
 
 import com.capgemini.gameoflife.board.utils.*;
@@ -8,14 +9,14 @@ import com.capgemini.gameoflife.cell.*;
 
 public final class GameOfLifeBoard implements CellGameBoard {
 	private Map<BoardPosition, Cell> cellsMap;
-	private Set<Cell> cellsToCalculate;
+	private Map<BoardPosition, Cell> cellsToCalculate;
 
 	public GameOfLifeBoard(Map<BoardPosition, Cell> cells) {
 		this.cellsMap = cells;
 		
-		cellsToCalculate = cellsMap.values().stream()
-				.filter(cell -> cell instanceof BorderCell == false)
-				.collect(Collectors.toSet());
+		cellsToCalculate = cellsMap.entrySet().stream()
+				.filter(entry -> entry.getValue() instanceof BorderCell == false)
+				.collect(Collectors.toMap(k -> k.getKey(), v -> v.getValue()));
 		}
 
 	@Override
@@ -23,42 +24,45 @@ public final class GameOfLifeBoard implements CellGameBoard {
 		IntStream.range(0, roundsAmount).forEach(i -> iterate());
 	}
 
-	private void applyLinkingTo(Collection<Cell> cells) {
-		cells.forEach(cell -> { 
-			if (cell.getNeighbours().size() < 8) {
-				setCellNeighbours(cell);
+	private void applyLinkingTo(Map<BoardPosition, Cell> cells) {
+		cells.entrySet().forEach(entry -> { 
+			if (entry.getValue().getNeighbours().size() < 8) {
+				setCellNeighbours(entry);
 			}
 		});
 	}
 
-	private void setCellNeighbours(Cell cell) {
-		cell.getPosition().getNeighbourPositions().forEach(pos -> {
+	private void setCellNeighbours(Entry<BoardPosition, Cell> cellEntry) {
+		cellEntry.getKey().getNeighbourPositions().forEach(pos -> {
 			if (!cellsMap.containsKey(pos)) {
 				cellsMap.put(pos, GameCell.deadAt(pos));
 			}
 			Cell neighbour = cellsMap.get(pos); 
-			cell.addNeighbour(neighbour);
-			neighbour.addNeighbour(cell);
+			cellEntry.getValue().addNeighbour(neighbour);
+			neighbour.addNeighbour(cellEntry.getValue());
 		});
 	}
 
 	private void iterate() {
-		cellsToCalculate.forEach(cell -> cell.evaluateNextGeneration());
-		cellsToCalculate.forEach(cell -> cell.nextGeneration());
+		cellsToCalculate.values().forEach(cell -> cell.evaluateNextGeneration());
+		cellsToCalculate.values().forEach(cell -> cell.nextGeneration());
 		filterCellsToCalculate();
 		applyLinkingTo(cellsToCalculate);
 		addToBeBornCellsToCalculated();
 	}
 
 	private void filterCellsToCalculate() {
-		cellsToCalculate.removeIf(cell -> LifeState.DEAD.equals(cell.getState()));
+		cellsToCalculate.entrySet()
+					.removeIf(entry -> LifeState.DEAD.equals(entry.getValue().getState()));
 	}
 
 	private void addToBeBornCellsToCalculated() {
-		cellsToCalculate.addAll(cellsToCalculate.parallelStream()
-				.flatMap(cell -> cell.getNeighbours().stream())
-				.filter(neighbour -> neighbour.getLivingNeighboursCount() == 3)
-				.collect(Collectors.toSet()));
+		Collection<BoardPosition> neighbourPositions = new HashSet<>();
+		cellsToCalculate.keySet()
+					.forEach(pos -> neighbourPositions.addAll(pos.getNeighbourPositions()));
+		neighbourPositions.stream()
+					.filter(pos -> cellsMap.get(pos).getLivingNeighboursCount()==3)
+					.forEach(pos -> cellsToCalculate.put(pos, cellsMap.get(pos)));
 	}
 
 	@Override

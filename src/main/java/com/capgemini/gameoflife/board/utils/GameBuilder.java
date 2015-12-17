@@ -38,17 +38,17 @@ public class GameBuilder {
 	}
 
 	public GameOfLifeBoard build() {
-		Set<Cell> initialLivingCells = boardCells.values().stream()
-				.filter(cell -> BorderCell.class.equals(cell.getClass()) == false)
-				.collect(Collectors.toSet());
-		initialLivingCells.forEach(cell -> {
-			cell.getPosition().getNeighbourPositions().forEach(pos -> {
+		Map<BoardPosition, Cell> initialLivingCells = boardCells.entrySet().stream()
+				.filter(cell -> BorderCell.class.equals(cell.getValue().getClass()) == false)
+				.collect(Collectors.toMap(k -> k.getKey(), v -> v.getValue()));
+		initialLivingCells.entrySet().forEach(cell -> {
+			cell.getKey().getNeighbourPositions().forEach(pos -> {
 			if (boardCells.containsKey(pos) == false) {
 				boardCells.put(pos, GameCell.deadAt(pos));
 			}
 			Cell neighbour = boardCells.get(pos);
-			cell.addNeighbour(neighbour);
-			neighbour.addNeighbour(cell);
+			cell.getValue().addNeighbour(neighbour);
+			neighbour.addNeighbour(cell.getValue());
 			});
 		});
 		return new GameOfLifeBoard(boardCells);

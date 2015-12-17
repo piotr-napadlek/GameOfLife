@@ -6,23 +6,21 @@ import com.capgemini.gameoflife.board.utils.BoardPosition;
 
 public class GameCell implements Cell {
 	public static GameCell deadAt(BoardPosition position) {
-		return new GameCell(LifeState.DEAD, position);
+		return new GameCell(LifeState.DEAD);
 	}
 	
 	public static GameCell livingAt(BoardPosition position) {
-		return new GameCell(LifeState.ALIVE, position);
+		return new GameCell(LifeState.ALIVE);
 	}
 	
 	private final Set<Cell> neighbours = new HashSet<Cell>(8, 1.0f);
-	private final BoardPosition position;
 	private LifeState currentState;
 	private LifeState nextGenerationState;
 	private int livingNeighbours;
 
-	private GameCell(LifeState cellState, BoardPosition position) {
+	private GameCell(LifeState cellState) {
 		currentState = cellState;
 		nextGenerationState = cellState;
-		this.position = position;
 	}
 
 	@Override
@@ -37,10 +35,6 @@ public class GameCell implements Cell {
 
 	public LifeState getState() {
 		return currentState;
-	}
-
-	public BoardPosition getPosition() {
-		return position;
 	}
 	
 	@Override
