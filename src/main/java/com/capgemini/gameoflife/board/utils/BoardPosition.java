@@ -6,9 +6,13 @@ public class BoardPosition {
 	private final int row;
 	private final int column;
 
-	public BoardPosition(int row, int column) {
+	private BoardPosition(int row, int column) {
 		this.row = row;
 		this.column = column;
+	}
+	
+	public static BoardPosition of(int row, int column) {
+		return new BoardPosition(row, column);
 	}
 
 	public int getRow() {

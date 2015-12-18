@@ -7,14 +7,14 @@ import com.capgemini.gameoflife.board.utils.*;
 import com.capgemini.gameoflife.cell.*;
 
 public final class GameOfLifeBoard implements CellGameBoard {
-	private BiMap<BoardPosition, Cell> cellsMap;
+	private Map<BoardPosition, Cell> cellsMap;
 	private Set<Cell> cellsToCalculate;
 
-	public GameOfLifeBoard(BiMap<BoardPosition, Cell> cells) {
+	public GameOfLifeBoard(Map<BoardPosition, Cell> cells) {
 		this.cellsMap = cells;
 		
-		cellsToCalculate = cellsMap.valueSet().stream()
-				.filter(cell -> cell instanceof BorderCell == false)
+		cellsToCalculate = cellsMap.values().stream()
+				.filter(cell -> cell instanceof GameCell)
 				.collect(Collectors.toSet());
 		}
 
@@ -26,15 +26,15 @@ public final class GameOfLifeBoard implements CellGameBoard {
 	private void applyLinkingTo(Collection<Cell> cells) {
 		cells.forEach(cell -> { 
 			if (cell.getNeighbours().size() < 8) {
-				setCellNeighbours(cellsMap.getByValue(cell), cell);
+				setCellNeighbours(cell);
 			}
 		});
 	}
 
-	private void setCellNeighbours(BoardPosition position, Cell cell) {
-		position.getNeighbourPositions().forEach(pos -> {
+	private void setCellNeighbours(Cell cell) {
+		cell.getPosition().getNeighbourPositions().forEach(pos -> {
 			if (!cellsMap.containsKey(pos)) {
-				cellsMap.put(pos, new DeadCell());
+				cellsMap.put(pos, GameCell.deadAt(pos));
 			}
 			Cell neighbour = cellsMap.get(pos); 
 			cell.addNeighbour(neighbour);
@@ -47,14 +47,14 @@ public final class GameOfLifeBoard implements CellGameBoard {
 		cellsToCalculate.forEach(cell -> cell.nextGeneration());
 		filterCellsToCalculate();
 		applyLinkingTo(cellsToCalculate);
-		addNeighboursOfLivingToCalculated();
+		addToBeBornCellsToCalculated();
 	}
 
 	private void filterCellsToCalculate() {
 		cellsToCalculate.removeIf(cell -> LifeState.DEAD.equals(cell.getState()));
 	}
 
-	private void addNeighboursOfLivingToCalculated() {
+	private void addToBeBornCellsToCalculated() {
 		cellsToCalculate.addAll(cellsToCalculate.parallelStream()
 				.flatMap(cell -> cell.getNeighbours().stream())
 				.filter(neighbour -> neighbour.getLivingNeighboursCount() == 3)
@@ -63,13 +63,13 @@ public final class GameOfLifeBoard implements CellGameBoard {
 
 	@Override
 	public Collection<Cell> getCells() {
-		return cellsMap.valueSet();
+		return cellsMap.values();
 	}
 
 	@Override
 	public Cell getCellAt(int row, int column) {
-		return cellsMap.getOrDefault(new BoardPosition(row, column),
-				new DeadCell());
+		return cellsMap.getOrDefault(BoardPosition.of(row, column),
+				GameCell.deadAt(BoardPosition.of(row, column)));
 	}
 
 	@Override
@@ -103,7 +103,7 @@ public final class GameOfLifeBoard implements CellGameBoard {
 		StringBuilder stringBuilder = new StringBuilder("\n");
 		IntStream.rangeClosed(minRow(), maxRow()).forEach(i -> {
 			IntStream.rangeClosed(minColumn(), maxColumn()).forEach(j -> {
-				stringBuilder.append(Optional.ofNullable(cellsMap.get(new BoardPosition(i, j)))
+				stringBuilder.append(Optional.ofNullable(cellsMap.get(BoardPosition.of(i, j)))
 						.map(c -> c.toString()).orElse(" . "));
 			});
 			stringBuilder.append("\n");

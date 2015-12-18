@@ -3,12 +3,12 @@ package com.capgemini.gameoflife.cell;
 import java.util.Collection;
 import java.util.Collections;
 
-public final class BorderCell extends GameCell {
-	private static BorderCell borderCell = new BorderCell();
+import com.capgemini.gameoflife.board.utils.BoardPosition;
 
-	private BorderCell() {
-		super(LifeState.DEAD);
-	}
+public final class BorderCell implements Cell {
+	private static final BorderCell borderCell = new BorderCell();
+
+	private BorderCell() {}
 
 	public static BorderCell getInstance() {
 		return borderCell;
@@ -39,5 +39,9 @@ public final class BorderCell extends GameCell {
 	@Override
 	public int getLivingNeighboursCount() {
 		return 0;
+	}
+	@Override
+	public BoardPosition getPosition() {
+		return null;
 	}
 }

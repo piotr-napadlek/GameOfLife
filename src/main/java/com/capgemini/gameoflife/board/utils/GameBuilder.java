@@ -1,18 +1,20 @@
 package com.capgemini.gameoflife.board.utils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import com.capgemini.gameoflife.board.GameOfLifeBoard;
-import com.capgemini.gameoflife.cell.*;
+import com.capgemini.gameoflife.cell.BorderCell;
+import com.capgemini.gameoflife.cell.Cell;
+import com.capgemini.gameoflife.cell.GameCell;
 
 public class GameBuilder {
-	private BiMap<BoardPosition, Cell> boardCells;
+	private Map<BoardPosition, Cell> boardCells = new HashMap<BoardPosition, Cell>();
 	
-	private GameBuilder() { 
-		boardCells = new ConcurrentBiHashMap<BoardPosition, Cell>();
-	}
+	private GameBuilder() {}
 
 	public static GameBuilder getBuilder() {
 		return new GameBuilder();
@@ -22,31 +24,31 @@ public class GameBuilder {
 	 	Map<BoardPosition, Cell> borderCells = 
 	 			new HashMap<BoardPosition, Cell>(((width + height) + 2) * 2);
 		IntStream.range(-1, width + 1).forEach(i -> 
-				borderCells.put(new BoardPosition(-1, i), BorderCell.getInstance()));
+				borderCells.put(BoardPosition.of(-1, i), BorderCell.getInstance()));
 		IntStream.range(-1, width + 1).forEach(i -> 
-				borderCells.put(new BoardPosition(height, i), BorderCell.getInstance()));
+				borderCells.put(BoardPosition.of(height, i), BorderCell.getInstance()));
 		IntStream.range(0, height).forEach(i ->
-				borderCells.put(new BoardPosition(i, -1), BorderCell.getInstance()));
+				borderCells.put(BoardPosition.of(i, -1), BorderCell.getInstance()));
 		IntStream.range(0, height).forEach(i ->
-				borderCells.put(new BoardPosition(i, width), BorderCell.getInstance()));
+				borderCells.put(BoardPosition.of(i, width), BorderCell.getInstance()));
 		boardCells.putAll(borderCells);
-		
 		return this;
 	}
 
 	public GameBuilder withLivingCellAtPosition(int row, int column) {
-		boardCells.put(new BoardPosition(row, column), new LivingCell());
+		BoardPosition newPosition = BoardPosition.of(row, column);
+		boardCells.put(newPosition, GameCell.livingAt(newPosition));
 		return this;
 	}
 
 	public GameOfLifeBoard build() {
-		Set<Cell> initialLivingCells = boardCells.valueSet().stream()
+		Set<Cell> initialLivingCells = boardCells.values().stream()
 				.filter(cell -> BorderCell.class.equals(cell.getClass()) == false)
 				.collect(Collectors.toSet());
 		initialLivingCells.forEach(cell -> {
-			boardCells.getByValue(cell).getNeighbourPositions().forEach(pos -> {
+			cell.getPosition().getNeighbourPositions().forEach(pos -> {
 			if (boardCells.containsKey(pos) == false) {
-				boardCells.put(pos, new DeadCell());
+				boardCells.put(pos, GameCell.deadAt(pos));
 			}
 			Cell neighbour = boardCells.get(pos);
 			cell.addNeighbour(neighbour);
