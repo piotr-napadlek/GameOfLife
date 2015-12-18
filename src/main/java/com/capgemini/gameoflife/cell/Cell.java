@@ -5,6 +5,7 @@ import java.util.*;
 public interface Cell {
 	public LifeState getState();
 	public void addNeighbour(Cell neighbour);
+	public void deleteNeighbour(Cell neighbour);
 	public Collection<Cell> getNeighbours();
 	
 	public void evaluateNextGeneration();

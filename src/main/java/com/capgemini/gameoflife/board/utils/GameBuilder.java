@@ -8,7 +8,7 @@ import com.capgemini.gameoflife.board.GameOfLifeBoard;
 import com.capgemini.gameoflife.cell.*;
 
 public class GameBuilder {
-	private Map<BoardPosition, Cell> boardCells = new HashMap<BoardPosition, Cell>();
+	private Map<BoardPosition, Cell> boardCells = new ConcurrentHashMap<BoardPosition, Cell>();
 	
 	private GameBuilder() {}
 

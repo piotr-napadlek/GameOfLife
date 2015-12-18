@@ -88,4 +88,9 @@ public class GameCell implements Cell {
 		return LifeState.ALIVE.equals(currentState) ? "|" + "X" + "|" :
 			" " + livingNeighbours + " ";
 	}
+
+	@Override
+	public void deleteNeighbour(Cell neighbour) {
+		neighbours.remove(neighbour);
+	}
 }

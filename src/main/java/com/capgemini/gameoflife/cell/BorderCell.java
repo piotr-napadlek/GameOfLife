@@ -23,6 +23,8 @@ public final class BorderCell implements Cell {
 	@Override
 	public void evaluateNextGeneration() { }
 	@Override
+	public void deleteNeighbour(Cell neighbour) {}
+	@Override
 	public Collection<Cell> getNeighbours() {
 		return Collections.emptySet();
 	}

@@ -25,26 +25,31 @@ public final class GameOfLifeBoard implements CellGameBoard {
 	}
 
 	private void applyLinkingTo() {
-		Map<BoardPosition, Cell> neighboursToAdd = new HashMap<>(8, 1.0f);
-		
-		cellsMap.entrySet().forEach(entry -> { 
-			if (entry.getValue().getNeighbours().size() < 100000
-					&& entry.getValue() instanceof GameCell) {
+		Map<BoardPosition, Cell> newNeighbours = new HashMap<>();
+		cellsMap.entrySet().forEach(entry -> {
+			if(entry.getValue() instanceof GameCell 
+					&& entry.getValue().getNeighbours().size() < 8) {
 				entry.getKey().getNeighbourPositions().forEach(pos -> {
-					Cell neighbour; 
-					if (!cellsMap.containsKey(pos)) {
-						neighbour = GameCell.deadAt(pos);
-						neighboursToAdd.put(pos, GameCell.deadAt(pos));
-					} else {
-					neighbour = cellsMap.get(pos);
+					if (cellsMap.containsKey(pos) == false) {
+						newNeighbours.put(pos, GameCell.deadAt(pos));
 					}
-					entry.getValue().addNeighbour(neighbour);
-					neighbour.addNeighbour(entry.getValue());
 				});
 			}
 		});
+		cellsMap.putAll(newNeighbours);
 		
-		cellsMap.putAll(neighboursToAdd);
+		newNeighbours.entrySet().forEach(entry -> { 
+				entry.getKey().getNeighbourPositions().forEach(pos -> {
+				if (cellsMap.containsKey(pos)) {
+					Cell neighbourCell = cellsMap.get(pos);
+					neighbourCell.addNeighbour(entry.getValue());
+					entry.getValue().addNeighbour(neighbourCell);
+				}
+			});
+		});
+	}
+	
+	private void populateWitnNeighbours() {
 	}
 
 	private void setCellNeighbours(Entry<BoardPosition, Cell> cellEntry) {
@@ -62,16 +67,23 @@ public final class GameOfLifeBoard implements CellGameBoard {
 	private void iterate() {
 		cellsMap.values().forEach(cell -> cell.evaluateNextGeneration());
 		cellsMap.values().forEach(cell -> cell.nextGeneration());
-		applyLinkingTo();
 		filterCellsToCalculate();
+		populateWitnNeighbours();
+		applyLinkingTo();
 //		addToBeBornCellsToCalculated();
 	}
 
 	private void filterCellsToCalculate() {
-		cellsMap.entrySet()
-					.removeIf(entry -> LifeState.DEAD.equals(entry.getValue().getState())
-							&& entry.getValue().getLivingNeighboursCount() == 0
-							&& entry.getValue() instanceof GameCell);
+		Map<BoardPosition, Cell> cellsToDelete = cellsMap.entrySet().stream()
+				.filter(entry -> LifeState.DEAD.equals(entry.getValue().getState())
+						&& entry.getValue().getLivingNeighboursCount() != 3
+						&& entry.getValue() instanceof GameCell)
+				.collect(Collectors.toMap(k -> k.getKey(), v -> v.getValue()));
+		cellsToDelete.values().stream()
+				.forEach(cell -> cell.getNeighbours()
+						.forEach(neighbour -> neighbour.deleteNeighbour(cell)));
+		cellsToDelete.keySet().forEach(key -> cellsMap.remove(key));
+		
 	}
 
 	private void addToBeBornCellsToCalculated() {
