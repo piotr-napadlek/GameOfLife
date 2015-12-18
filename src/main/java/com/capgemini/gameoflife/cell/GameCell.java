@@ -42,7 +42,7 @@ public class GameCell implements Cell {
 	public BoardPosition getPosition() {
 		return position;
 	}
-	
+
 	@Override
 	public void nextGeneration() {
 		if (currentState.equals(nextGenerationState) == false) {
@@ -61,7 +61,7 @@ public class GameCell implements Cell {
 			}
 		}
 	}
-	
+
 	@Override
 	public void addNeighbour(Cell neighbour) {
 		if (neighbours.add(neighbour) && LifeState.ALIVE.equals(neighbour.getState())) {
@@ -88,7 +88,7 @@ public class GameCell implements Cell {
 	public int getLivingNeighboursCount() {
 		return livingNeighbours;
 	}
-	
+
 	@Override
 	public String toString() {
 		return LifeState.ALIVE.equals(currentState) ? "|" + "X" + "|" :

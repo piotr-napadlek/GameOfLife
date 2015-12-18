@@ -14,7 +14,7 @@ public final class GameOfLifeBoard implements CellGameBoard {
 		this.cellsMap = cells;
 		
 		cellsToCalculate = cellsMap.values().stream()
-				.filter(cell -> cell instanceof BorderCell == false)
+				.filter(cell -> cell instanceof GameCell)
 				.collect(Collectors.toSet());
 		}
 

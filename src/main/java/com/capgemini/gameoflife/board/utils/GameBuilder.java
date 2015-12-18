@@ -1,14 +1,18 @@
 package com.capgemini.gameoflife.board.utils;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.capgemini.gameoflife.board.GameOfLifeBoard;
-import com.capgemini.gameoflife.cell.*;
+import com.capgemini.gameoflife.cell.BorderCell;
+import com.capgemini.gameoflife.cell.Cell;
+import com.capgemini.gameoflife.cell.GameCell;
 
 public class GameBuilder {
-	private Map<BoardPosition, Cell> boardCells = new ConcurrentHashMap<BoardPosition, Cell>();
+	private Map<BoardPosition, Cell> boardCells = new HashMap<BoardPosition, Cell>();
 	
 	private GameBuilder() {}
 
