@@ -16,7 +16,7 @@ public final class GameOfLifeBoard implements CellGameBoard {
 		cellsToCalculate = cellsMap.values().stream()
 				.filter(cell -> cell instanceof GameCell)
 				.collect(Collectors.toSet());
-		}
+	}
 
 	@Override
 	public void processRounds(int roundsAmount) {
