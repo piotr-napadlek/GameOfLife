@@ -1,10 +1,16 @@
 package com.capgemini.gameoflife.board;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-import com.capgemini.gameoflife.board.utils.*;
-import com.capgemini.gameoflife.cell.*;
+import com.capgemini.gameoflife.board.utils.BoardPosition;
+import com.capgemini.gameoflife.cell.Cell;
+import com.capgemini.gameoflife.cell.GameCell;
+import com.capgemini.gameoflife.cell.LifeState;
 
 public final class GameOfLifeBoard implements CellGameBoard {
 	private Map<BoardPosition, Cell> cellsMap;

@@ -1,6 +1,8 @@
 package com.capgemini.gameoflife.board.utils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class BoardPosition {
 	private final int row;

@@ -1,6 +1,8 @@
 package com.capgemini.gameoflife.cell;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.capgemini.gameoflife.board.utils.BoardPosition;
 
