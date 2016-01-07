@@ -33,6 +33,6 @@ public class GameOfLife {
 		});
 		// this comment should trigger an automated Jenkins build
 		// based on github repository
-		// yet another try to automate build
+		// yet another try
 	}
 }
