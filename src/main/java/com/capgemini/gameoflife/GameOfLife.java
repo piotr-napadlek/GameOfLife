@@ -31,5 +31,7 @@ public class GameOfLife {
 				e.printStackTrace();
 			}
 		});
+		// this comment should trigger an automated Jenkins build
+		// based on github repository
 	}
 }
